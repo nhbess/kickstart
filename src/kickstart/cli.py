@@ -44,8 +44,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="kickstart",
         description="Create a uv-managed Python project with default Cursor rules.",
+        epilog=dedent(
+            """\
+            examples:
+              kickstart my_project
+              kickstart my_project "Short project description"
+
+            The project name is a folder/package-style name: use no quotes,
+            no spaces, and only letters, numbers, dots, underscores, or hyphens.
+            Put the optional description in quotes if you want to keep it together.
+            """
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("name", help="Project folder name, for example: my_project")
+    parser.add_argument(
+        "name",
+        help="Project folder name, for example: my_project. No spaces or quotes.",
+    )
     parser.add_argument(
         "description",
         nargs="*",
@@ -99,6 +114,9 @@ def validate_inputs(
     if shutil.which("uv") is None:
         raise KickstartError("uv is not available on PATH")
 
+    if shutil.which("git") is None:
+        raise KickstartError("git is not available on PATH")
+
 
 def create_project(
     *,
@@ -113,6 +131,7 @@ def create_project(
 
     run_uv_init(project_name, description, project_dir, kind, python_version)
     update_gitignore(project_dir)
+    run_git_init(project_dir)
     run(["uv", "sync"], cwd=project_dir)
     write_cursor_rules(project_dir)
     write_readme(project_name, description, project_dir)
@@ -152,6 +171,10 @@ def run_uv_init(
         command.extend(["--python", python_version])
 
     run(command, cwd=project_dir)
+
+
+def run_git_init(project_dir: Path) -> None:
+    run(["git", "init"], cwd=project_dir)
 
 
 def write_cursor_rules(project_dir: Path) -> None:
