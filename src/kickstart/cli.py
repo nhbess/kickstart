@@ -13,7 +13,12 @@ from textwrap import dedent
 DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", r"C:\Users\nhbes\Repos"))
 VALID_PROJECT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 BUNDLED_RULES_PACKAGE = "kickstart.rules"
-GITIGNORE_ENTRIES = (".cursor/",)
+GITIGNORE_ENTRIES = (
+    ".cursor/",
+    ".docs/",
+    ".venv/",
+    "__pycache__/",
+)
 REQUIRED_COMMANDS = ("git", "uv")
 TRACKED_EMPTY_DIRS = (".docs",)
 
