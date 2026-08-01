@@ -5,14 +5,15 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from importlib import resources
 from pathlib import Path
 from textwrap import dedent
 
 
 DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", r"C:\Users\nhbes\Repos"))
+RULES_REPO_URL = os.environ.get(
+    "KICKSTART_RULES_REPO", "https://github.com/nhbess/cursor-rules.git"
+)
 VALID_PROJECT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-BUNDLED_RULES_PACKAGE = "kickstart.rules"
 GITIGNORE_ENTRIES = (
     ".cursor/",
     ".docs/",
@@ -191,15 +192,16 @@ def ensure_tracked_empty_dirs(project_dir: Path, directories: tuple[str, ...]) -
 
 def write_cursor_rules(project_dir: Path) -> None:
     rules_dir = project_dir / ".cursor" / "rules"
-    rules_dir.mkdir(parents=True, exist_ok=True)
-    copy_bundled_rules(rules_dir)
+    rules_dir.parent.mkdir(parents=True, exist_ok=True)
 
+    try:
+        run(["git", "clone", RULES_REPO_URL, str(rules_dir)], cwd=project_dir)
+    except KickstartError as error:
+        raise KickstartError(
+            f"could not clone the shared rules repo {RULES_REPO_URL} ({error})"
+        ) from error
 
-def copy_bundled_rules(rules_dir: Path) -> None:
-    for rule_file in resources.files(BUNDLED_RULES_PACKAGE).iterdir():
-        if rule_file.is_file() and rule_file.name.endswith(".mdc"):
-            destination = rules_dir / rule_file.name
-            destination.write_text(rule_file.read_text(encoding="utf-8"), encoding="utf-8")
+    print("Cloned shared Cursor rules. Edit rules there and push to share them.")
 
 
 def ensure_gitignore_entries(gitignore: Path, entries: tuple[str, ...]) -> None:
