@@ -1,0 +1,33 @@
+---
+description: Do not use default values on function or method parameters
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# No default parameters
+
+**Do not assign default values to parameters** of any function or method — public, private, helper, `__init__`, or `@dataclass`-style constructors alike. No `def f(x=1)`, no `def g(a, b=None)`.
+
+- Callers pass every argument explicitly. Values that would have been defaults become named constants at the call site and are passed in.
+- Optional behavior is expressed by **requiring** the caller to pass a value, not by omitting it.
+
+```python
+# Bad
+def load(path: Path, limit: int = 100) -> list: ...
+
+class Simulation:
+    def __init__(self, size: int, seed: int | None = None): ...
+
+# Good
+def load(path: Path, limit: int) -> list: ...
+
+class Simulation:
+    def __init__(self, size: int, seed: int | None): ...
+
+# call site
+ROW_LIMIT = 100
+rows = load(DATA_PATH, ROW_LIMIT)
+sim = Simulation(64, None)
+```
+
+If the user wants defaults for a specific function, they must say so.

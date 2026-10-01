@@ -1,0 +1,50 @@
+---
+description: Example imports and config live inside if __name__ == "__main__"
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# `__main__` block is the usage example
+
+Treat `if __name__ == "__main__":` as a runnable example of how to use the current file.
+
+- **Top of file**: imports and code needed when the module is imported elsewhere (types, shared helpers, library API).
+- **Inside `__main__`**: imports, config constants, and wiring only required to run that example (paths, toggles, sample inputs, `json`, `os`, `load_dotenv`, ...).
+
+Do not pull example-only imports or config up to module level just because the `__main__` block uses them.
+
+```python
+# Good
+from pathlib import Path
+
+import numpy as np
+
+
+def run_simulation(size: int, steps: int, seed: int) -> np.ndarray:
+    ...
+
+
+if __name__ == "__main__":
+    import json
+
+    SIZE = 64
+    STEPS = 1000
+    SEED = 0
+    OUTPUT_PATH = Path("results/run.json")
+
+    grid = run_simulation(SIZE, STEPS, SEED)
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(json.dumps(grid.tolist()))
+    print(f"Wrote {OUTPUT_PATH}")
+```
+
+```python
+# Bad — example-only imports and config at module top
+import json
+from pathlib import Path
+
+import numpy as np
+
+SIZE = 64
+OUTPUT_PATH = Path("results/run.json")
+```

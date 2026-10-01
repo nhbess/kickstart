@@ -1,0 +1,28 @@
+---
+description: Do not use default values in dict.get — missing keys should raise
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# No default values in dict lookups
+
+Do **not** pass a default to `.get()` (no `d.get("key", fallback)`), and do not use bare `d.get("key")` to get `None` silently. If a key is required, use subscript access so a missing key raises `KeyError`.
+
+- Required data: `value = data["key"]`
+- Optional data: branch explicitly (`if "key" in data:`) — do not paper over absence with a default
+- Same for `os.environ`: `os.environ["API_TOKEN"]`, not `os.environ.get("API_TOKEN", "")`
+- Applies to all dict-like objects: JSON responses, config dicts, result dicts, `.npz` proxies
+
+```python
+# Bad
+items = response.get("data", [])
+name = record.get("name", "unknown")
+token = os.environ.get("API_TOKEN", "")
+
+# Good
+items = response["data"]
+name = record["name"]
+token = os.environ["API_TOKEN"]
+```
+
+If the user wants a fallback for a specific lookup, they must say so.

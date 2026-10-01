@@ -10,18 +10,14 @@ from textwrap import dedent
 
 
 DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", r"C:\Users\nhbes\Repos"))
-RULES_REPO_URL = os.environ.get(
-    "KICKSTART_RULES_REPO", "https://github.com/nhbess/cursor-rules.git"
-)
+RULES_DIR = Path(__file__).parent / "rules"
 VALID_PROJECT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 GITIGNORE_ENTRIES = (
-    ".cursor/",
     ".docs/",
     ".venv/",
     "__pycache__/",
 )
 REQUIRED_COMMANDS = ("git", "uv")
-TRACKED_EMPTY_DIRS = (".docs",)
 
 
 @dataclass(frozen=True)
@@ -136,7 +132,7 @@ def create_project(project: Project) -> None:
 
     run_uv_init(project)
     ensure_empty_directory(project.directory / "src")
-    ensure_tracked_empty_dirs(project.directory, TRACKED_EMPTY_DIRS)
+    (project.directory / ".docs").mkdir(exist_ok=True)
     ensure_gitignore_entries(project.directory / ".gitignore", GITIGNORE_ENTRIES)
     run(["git", "init"], cwd=project.directory)
     run(["uv", "sync"], cwd=project.directory)
@@ -183,25 +179,17 @@ def ensure_empty_directory(directory: Path) -> None:
             child.unlink()
 
 
-def ensure_tracked_empty_dirs(project_dir: Path, directories: tuple[str, ...]) -> None:
-    for directory_name in directories:
-        directory = project_dir / directory_name
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / ".gitkeep").touch()
-
-
 def write_cursor_rules(project_dir: Path) -> None:
+    rule_files = sorted(RULES_DIR.glob("*.mdc"))
+    if not rule_files:
+        raise KickstartError(f"no rules found in {RULES_DIR}")
+
     rules_dir = project_dir / ".cursor" / "rules"
-    rules_dir.parent.mkdir(parents=True, exist_ok=True)
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    for rule_file in rule_files:
+        shutil.copy2(rule_file, rules_dir / rule_file.name)
 
-    try:
-        run(["git", "clone", RULES_REPO_URL, str(rules_dir)], cwd=project_dir)
-    except KickstartError as error:
-        raise KickstartError(
-            f"could not clone the shared rules repo {RULES_REPO_URL} ({error})"
-        ) from error
-
-    print("Cloned shared Cursor rules. Edit rules there and push to share them.")
+    print(f"Copied {len(rule_files)} Cursor rules into {rules_dir}")
 
 
 def ensure_gitignore_entries(gitignore: Path, entries: tuple[str, ...]) -> None:

@@ -10,22 +10,19 @@ kickstart my_project "Short project description"
 ```
 
 The command creates a new project under `C:\Users\nhbes\Repos`, initializes a
-bare `uv` project, creates an empty `src/`, tracks `.docs/` with a placeholder,
-initializes git, creates `.venv` via `uv sync`, clones the shared Cursor rules
-repo into `.cursor/rules`, writes a starter README, adds `.cursor/` to
-`.gitignore`, and opens the folder in Cursor.
+bare `uv` project, creates an empty `src/`, creates an empty `.docs/`,
+initializes git, creates `.venv` via `uv sync`, copies the default Cursor rules
+into `.cursor/rules`, writes a starter README, and opens the folder in Cursor.
 
-## Shared Cursor rules
+## Cursor rules
 
-`.cursor/rules` is a clone of the shared rules repo (default:
-`https://github.com/nhbess/cursor-rules`, override with `KICKSTART_RULES_REPO`).
-Because `.cursor/` is gitignored in generated projects, the clone has its own
-git history: add or edit rules in any project, then commit and push from inside
-`.cursor/rules` to make them available to every future project.
+The default rules live in `src/kickstart/rules/`. Every `.mdc` file there is
+copied into `.cursor/rules` of each new project. The copy has no link back to
+kickstart: each project owns its rules, commits them with its own code, and can
+add, edit, or delete them freely.
 
-The rules repo is the single source of truth: if the clone fails (for example,
-offline), kickstart stops with an error instead of creating a project without
-rules.
+To change the defaults for future projects, edit the files in
+`src/kickstart/rules/`. Existing projects are not affected.
 
 ## Options
 

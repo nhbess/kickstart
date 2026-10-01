@@ -1,0 +1,39 @@
+---
+description: No __init__.py; import by full path from the repo root, not bare sys.path modules
+alwaysApply: true
+---
+
+# No `__init__.py` package modules
+
+Do not create or rely on `__init__.py` files for imports.
+
+- Do not add new `__init__.py` files.
+- Do not import through package `__init__.py` re-exports.
+- Folders without `__init__.py` (namespace packages) are fine.
+
+At script entrypoints, put the **repo root** (or `src/`) on `sys.path`, then import by full path from there. This keeps the type checker able to resolve imports and avoids ambiguous bare module names.
+
+## Preferred style
+
+```python
+import sys
+from pathlib import Path
+
+_SRC = Path(__file__).resolve().parents[1]  # adjust depth to reach src/
+sys.path.insert(0, str(_SRC))
+
+from models.density import DensityModel
+from analysis.metrics import entropy
+```
+
+## Avoid
+
+```python
+# Bare imports after pushing nested folders onto sys.path
+# (type checker: "Import could not be resolved")
+sys.path.insert(0, str(_SRC / "models"))
+from density import DensityModel
+
+# Anything that requires __init__.py re-exports
+from models import DensityModel
+```

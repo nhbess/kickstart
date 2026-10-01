@@ -1,0 +1,29 @@
+---
+description: Use uv and pyproject.toml for deps; never add requirements.txt
+alwaysApply: true
+---
+
+# Use uv — never `requirements.txt`
+
+This project manages Python dependencies with **uv** and **`pyproject.toml`** (plus `uv.lock`).
+
+Do **not**:
+
+- Create or commit `requirements.txt` / `requirements-*.txt`
+- Tell the user to `pip install -r …` or `uv pip install -r …`
+- Document installs via a requirements file
+
+Do instead:
+
+- Add packages with `uv add <package>` (updates `pyproject.toml` and the lockfile)
+- Run scripts with `uv run …`
+- Sync the env with `uv sync` when needed
+
+```text
+# Bad
+uv pip install -r requirements.txt
+
+# Good
+uv add numpy matplotlib
+uv run src/main.py
+```

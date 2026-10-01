@@ -1,0 +1,10 @@
+---
+description: Never create or edit README files unless explicitly asked
+alwaysApply: true
+---
+
+# No README changes
+
+Do **not** create, edit, or update `README.md` (or any `README.*`) unless the user explicitly asks for it.
+
+Do not spend tokens writing or maintaining documentation files.

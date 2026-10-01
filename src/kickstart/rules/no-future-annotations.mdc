@@ -1,0 +1,16 @@
+---
+description: Do not use postponed evaluation of annotations (__future__ annotations)
+alwaysApply: true
+---
+
+# No `from __future__ import annotations`
+
+In Python files in this repo, **do not** add:
+
+```python
+from __future__ import annotations
+```
+
+Use normal annotations instead. For a forward reference to a class defined later in the same module, use a **string** (e.g. `"TradeEvent"`) where the type checker and runtime need it, or reorder definitions so the name exists when the annotation is evaluated.
+
+Do not reintroduce this import when editing existing files.
