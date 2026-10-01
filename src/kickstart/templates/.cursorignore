@@ -1,0 +1,42 @@
+# Hidden from Cursor's AI and index entirely.
+# Binary data the AI cannot read usefully; it should load it with code instead.
+
+# Arrays and tables
+*.npy
+*.npz
+*.feather
+*.parquet
+*.h5
+*.hdf5
+*.mat
+*.zarr/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Models and pickles
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Archives and raw binaries
+*.zip
+*.tar
+*.gz
+*.7z
+*.bin
+*.bit
+
+# Audio and video
+*.mp4
+*.webm
+*.mov
+*.avi
+*.wav
+*.mp3

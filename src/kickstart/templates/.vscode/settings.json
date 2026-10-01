@@ -1,0 +1,36 @@
+{
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/data/**": true,
+    "**/datasets/**": true,
+    "**/output/**": true,
+    "**/outputs/**": true,
+    "**/results/**": true,
+    "**/runs/**": true,
+    "**/checkpoints/**": true,
+    "**/wandb/**": true,
+    "**/mlruns/**": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/uv.lock": true,
+    "**/data": true,
+    "**/datasets": true,
+    "**/output": true,
+    "**/outputs": true,
+    "**/results": true,
+    "**/runs": true,
+    "**/checkpoints": true,
+    "**/wandb": true,
+    "**/mlruns": true,
+    "**/*.{npy,npz,feather,parquet,h5,hdf5,mat,sqlite,sqlite3,db,pkl,pickle,pt,pth,ckpt,safetensors,onnx,zip,tar,gz,7z,bin,bit}": true,
+    "**/*.{csv,tsv,dat,jsonl,log,vcd}": true,
+    "**/*.{png,jpg,jpeg,gif,svg,pdf,mp4,webm,mov,avi,wav,mp3}": true
+  }
+}

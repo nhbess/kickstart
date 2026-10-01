@@ -11,6 +11,7 @@ from textwrap import dedent
 
 DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", r"C:\Users\nhbes\Repos"))
 RULES_DIR = Path(__file__).parent / "rules"
+TEMPLATES_DIR = Path(__file__).parent / "templates"
 VALID_PROJECT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 GITIGNORE_ENTRIES = (
     ".docs/",
@@ -137,6 +138,7 @@ def create_project(project: Project) -> None:
     run(["git", "init"], cwd=project.directory)
     run(["uv", "sync"], cwd=project.directory)
     write_cursor_rules(project.directory)
+    copy_templates(project.directory)
     write_readme(project)
     print_next_steps(project)
 
@@ -190,6 +192,12 @@ def write_cursor_rules(project_dir: Path) -> None:
         shutil.copy2(rule_file, rules_dir / rule_file.name)
 
     print(f"Copied {len(rule_files)} Cursor rules into {rules_dir}")
+
+
+def copy_templates(project_dir: Path) -> None:
+    shutil.copytree(TEMPLATES_DIR, project_dir, dirs_exist_ok=True)
+    copied = sorted(path.relative_to(TEMPLATES_DIR).as_posix() for path in TEMPLATES_DIR.rglob("*") if path.is_file())
+    print(f"Copied templates: {', '.join(copied)}")
 
 
 def ensure_gitignore_entries(gitignore: Path, entries: tuple[str, ...]) -> None:

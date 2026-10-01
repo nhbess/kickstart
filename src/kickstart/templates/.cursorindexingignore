@@ -1,0 +1,28 @@
+# Not indexed, but the AI can still open these when you @ them.
+
+# Text data and logs
+*.csv
+*.tsv
+*.dat
+*.jsonl
+*.log
+*.vcd
+
+# Images and documents
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.pdf
+
+# Generated output folders
+data/
+datasets/
+output/
+outputs/
+results/
+runs/
+checkpoints/
+wandb/
+mlruns/

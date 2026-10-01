@@ -24,6 +24,19 @@ add, edit, or delete them freely.
 To change the defaults for future projects, edit the files in
 `src/kickstart/rules/`. Existing projects are not affected.
 
+## Keeping Cursor light
+
+Everything in `src/kickstart/templates/` is copied into the project root:
+
+- `.cursorignore`: binary data (`.npz`, `.npy`, `.sqlite`, checkpoints, archives,
+  media) is hidden from Cursor's AI and index.
+- `.cursorindexingignore`: text data, images, PDFs, and output folders (`data/`,
+  `output/`, `results/`, ...) are not indexed, but can still be opened with `@`.
+- `.vscode/settings.json`: the file watcher and search skip `.venv` and the same
+  data folders and file types.
+
+Add project-specific data folders to these files as the project grows.
+
 ## Options
 
 ```powershell
