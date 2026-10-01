@@ -9,17 +9,20 @@ kickstart my_project
 kickstart my_project "Short project description"
 ```
 
-The command creates a new project under `C:\Users\nhbes\Repos`, initializes a
+The command creates a new project under `~\Repos`, initializes a
 bare `uv` project, creates an empty `src/`, creates an empty `.docs/`,
 initializes git, creates `.venv` via `uv sync`, copies the default Cursor rules
-into `.cursor/rules`, writes a starter README, and opens the folder in Cursor.
+into `.cursor/rules`, and opens the folder in Cursor. No README is created.
+
+The generated `.gitignore` ignores `.cursor/`, `.docs/`, `.venv/`, `.vscode/`,
+and `__pycache__/`.
 
 ## Cursor rules
 
 The default rules live in `src/kickstart/rules/`. Every `.mdc` file there is
 copied into `.cursor/rules` of each new project. The copy has no link back to
-kickstart: each project owns its rules, commits them with its own code, and can
-add, edit, or delete them freely.
+kickstart: each project owns its rules and can add, edit, or delete them freely.
+They are gitignored along with the rest of `.cursor/`.
 
 To change the defaults for future projects, edit the files in
 `src/kickstart/rules/`. Existing projects are not affected.

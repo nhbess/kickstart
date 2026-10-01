@@ -1,0 +1,30 @@
+---
+description: Do not use regular expressions — use plain string methods or a real parser
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# No regex
+
+Do **not** use regular expressions (`re`, `regex`, or regex-based helpers such as `fnmatch.translate`) unless the user explicitly asks for one.
+
+Use plain string operations and the standard library instead:
+
+- Prefix / suffix checks: `str.startswith`, `str.endswith`, `str.removeprefix`, `str.removesuffix`
+- Splitting and trimming: `str.split`, `str.partition`, `str.strip`
+- Character classes: `str.isalnum`, `str.isdigit`, `str.isspace`, or `all(c in allowed for c in text)`
+- Substitution: `str.replace`
+- Structured formats: `json`, `csv`, `tomllib`, `urllib.parse`, `pathlib`, `datetime.strptime`
+
+```python
+# Bad
+import re
+if re.match(r"^\d{4}-\d{2}-\d{2}$", text):
+    year, month, day = re.split("-", text)
+
+# Good
+from datetime import datetime
+date = datetime.strptime(text, "%Y-%m-%d")
+```
+
+**Rationale:** regexes are hard to read, easy to get subtly wrong, and hide intent. Explicit string code says what it checks.

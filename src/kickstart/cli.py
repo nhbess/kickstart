@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -9,13 +10,15 @@ from pathlib import Path
 from textwrap import dedent
 
 
-DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", r"C:\Users\nhbes\Repos"))
+DEFAULT_REPOS_DIR = Path(os.environ.get("KICKSTART_REPOS", Path.home() / "Repos"))
 RULES_DIR = Path(__file__).parent / "rules"
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 VALID_PROJECT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 GITIGNORE_ENTRIES = (
+    ".cursor/",
     ".docs/",
     ".venv/",
+    ".vscode/",
     "__pycache__/",
 )
 REQUIRED_COMMANDS = ("git", "uv")
@@ -129,8 +132,22 @@ def require_commands(commands: tuple[str, ...]) -> None:
 
 
 def create_project(project: Project) -> None:
-    project.directory.mkdir(parents=False, exist_ok=True)
+    project.directory.mkdir(parents=False)
 
+    try:
+        populate_project(project)
+    except BaseException:
+        print(f"Setup failed, removing {project.directory}", file=sys.stderr)
+        remove_directory(project.directory)
+        raise
+
+    print_next_steps(project)
+
+    if project.open_cursor:
+        open_in_cursor(project.directory)
+
+
+def populate_project(project: Project) -> None:
     run_uv_init(project)
     ensure_empty_directory(project.directory / "src")
     (project.directory / ".docs").mkdir(exist_ok=True)
@@ -139,11 +156,18 @@ def create_project(project: Project) -> None:
     run(["uv", "sync"], cwd=project.directory)
     write_cursor_rules(project.directory)
     copy_templates(project.directory)
-    write_readme(project)
-    print_next_steps(project)
 
-    if project.open_cursor:
-        open_in_cursor(project.directory)
+
+def remove_directory(directory: Path) -> None:
+    # Git marks object files read-only on Windows, which rmtree cannot delete as-is.
+    def clear_readonly_and_retry(function, path, _error) -> None:
+        os.chmod(path, stat.S_IWRITE)
+        function(path)
+
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(directory, onexc=clear_readonly_and_retry)
+    else:
+        shutil.rmtree(directory, onerror=clear_readonly_and_retry)
 
 
 def run_uv_init(project: Project) -> None:
@@ -216,27 +240,6 @@ def ensure_gitignore_entries(gitignore: Path, entries: tuple[str, ...]) -> None:
 
 def gitignore_entry_key(entry: str) -> str:
     return entry.strip().rstrip("/")
-
-
-def write_readme(project: Project) -> None:
-    description_section = f"\n\n{project.description}" if project.description else ""
-    readme = dedent(
-        f"""\
-        # {project.name}{description_section}
-
-        ## Setup
-
-        ```powershell
-        uv sync
-        ```
-
-        ## Structure
-
-        Add code under `src/` and project notes under `.docs/`.
-        """
-    )
-
-    (project.directory / "README.md").write_text(readme, encoding="utf-8")
 
 
 def print_next_steps(project: Project) -> None:
